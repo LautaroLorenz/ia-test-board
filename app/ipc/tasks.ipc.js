@@ -79,6 +79,21 @@ function registerTasksIpc() {
         (0, events_1.emitTasksUpdated)();
         return id;
     }));
+    electron_1.ipcMain.handle('tasks:update', (_, payload) => __awaiter(this, void 0, void 0, function* () {
+        const db = (0, connection_1.getDb)();
+        yield db('tasks')
+            .where({ id: payload.taskId, status: 'waiting' })
+            .update({
+            title: payload.title,
+            description: payload.description,
+            input_variables_json: payload.inputVariablesJson,
+            repro_steps: payload.reproSteps,
+            expected_result: payload.expectedResult,
+            updated_at: db.fn.now()
+        });
+        (0, events_1.emitTasksUpdated)();
+        return true;
+    }));
     electron_1.ipcMain.handle('tasks:update-status', (_, payload) => __awaiter(this, void 0, void 0, function* () {
         const db = (0, connection_1.getDb)();
         yield db('tasks')
