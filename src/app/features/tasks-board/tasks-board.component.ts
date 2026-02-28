@@ -2,6 +2,10 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { map } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { CreateTaskInput, Task } from '../../core/models/task.model';
 import { BoardStore } from '../../core/state/board.store';
 import { TaskCardComponent } from './task-card.component';
@@ -9,7 +13,16 @@ import { TaskCardComponent } from './task-card.component';
 @Component({
   selector: 'app-tasks-board',
   standalone: true,
-  imports: [CommonModule, FormsModule, AsyncPipe, TaskCardComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AsyncPipe,
+    TaskCardComponent,
+    ButtonModule,
+    DialogModule,
+    InputTextModule,
+    TextareaModule
+  ],
   templateUrl: './tasks-board.component.html',
   styleUrl: './tasks-board.component.scss'
 })
@@ -29,6 +42,7 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
     reproSteps: '',
     expectedResult: ''
   };
+  isNewTaskDialogVisible = false;
 
   ngOnInit(): void {
     this.boardStore.initialize();
@@ -54,6 +68,11 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
       reproSteps: '',
       expectedResult: ''
     };
+    this.isNewTaskDialogVisible = false;
+  }
+
+  openNewTaskDialog(): void {
+    this.isNewTaskDialogVisible = true;
   }
 
   async changeStatus(payload: { taskId: number; status: 'waiting' | 'executing' | 'finished' }): Promise<void> {

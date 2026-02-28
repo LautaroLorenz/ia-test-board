@@ -1,8 +1,11 @@
 import { enableProdMode, provideZoneChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
 
 import { AppComponent } from './app/app.component';
 import { APP_CONFIG } from './environments/environment';
@@ -20,7 +23,14 @@ if (APP_CONFIG.production) {
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideZoneChangeDetection(),provideHttpClient(withInterceptorsFromDi()),
+    provideZoneChangeDetection(),
+    provideAnimations(),
+    providePrimeNG({
+      theme: {
+        preset: Aura
+      }
+    }),
+    provideHttpClient(withInterceptorsFromDi()),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: './assets/i18n/',

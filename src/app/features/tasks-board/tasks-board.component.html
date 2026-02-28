@@ -1,18 +1,42 @@
 <section class="page">
-  <h1>Tasks Board</h1>
+  <div class="page-header">
+    <h1>Tasks Board</h1>
+    <button pButton type="button" label="New Task" icon="pi pi-plus" (click)="openNewTaskDialog()"></button>
+  </div>
 
-  <form class="task-form" (ngSubmit)="createTask()">
-    <input name="title" [(ngModel)]="form.title" placeholder="Titulo de la task" required />
-    <textarea name="description" [(ngModel)]="form.description" placeholder="Descripcion"></textarea>
-    <textarea name="inputVariablesJson" [(ngModel)]="form.inputVariablesJson" placeholder='Variables de entrada (JSON)'></textarea>
-    <textarea name="reproSteps" [(ngModel)]="form.reproSteps" placeholder="Pasos para reproducir"></textarea>
-    <textarea name="expectedResult" [(ngModel)]="form.expectedResult" placeholder="Resultado esperado"></textarea>
-    <button type="submit">Crear Task</button>
-  </form>
+  <p-dialog
+    header="Create New Task"
+    [(visible)]="isNewTaskDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '640px' }">
+    <form class="task-form" (ngSubmit)="createTask()">
+      <label for="title">Titulo</label>
+      <input id="title" pInputText name="title" [(ngModel)]="form.title" required />
+
+      <label for="description">Descripcion</label>
+      <textarea id="description" pInputTextarea name="description" [(ngModel)]="form.description"></textarea>
+
+      <label for="inputVariablesJson">Variables de entrada (JSON)</label>
+      <textarea id="inputVariablesJson" pInputTextarea name="inputVariablesJson" [(ngModel)]="form.inputVariablesJson"></textarea>
+
+      <label for="reproSteps">Pasos para reproducir</label>
+      <textarea id="reproSteps" pInputTextarea name="reproSteps" [(ngModel)]="form.reproSteps"></textarea>
+
+      <label for="expectedResult">Resultado esperado</label>
+      <textarea id="expectedResult" pInputTextarea name="expectedResult" [(ngModel)]="form.expectedResult"></textarea>
+
+      <div class="dialog-actions">
+        <button pButton type="button" label="Cancelar" severity="secondary" (click)="isNewTaskDialogVisible = false"></button>
+        <button pButton type="submit" label="Guardar Task"></button>
+      </div>
+    </form>
+  </p-dialog>
 
   <div class="run-toolbar">
-    <button type="button" (click)="startRunGroup()">Iniciar corrida</button>
-    <button type="button" (click)="finishRunGroup()">Finalizar corrida</button>
+    <button pButton type="button" label="Iniciar corrida" (click)="startRunGroup()"></button>
+    <button pButton type="button" label="Finalizar corrida" severity="secondary" (click)="finishRunGroup()"></button>
     <span>Run Group Activo: {{ (runGroupId$ | async) ?? 'ninguno' }}</span>
   </div>
 

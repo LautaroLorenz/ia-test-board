@@ -10,7 +10,7 @@ import { Task, TaskStatus } from '../../core/models/task.model';
   template: `
     <article class="task-card">
       <h3>{{ task.title }}</h3>
-      <p><strong>Descripcion:</strong> {{ task.description }}</p>
+      <p><strong>Descripcion:</strong> {{ task.description || '-' }}</p>
       <p><strong>Variables:</strong> <code>{{ task.inputVariablesJson }}</code></p>
       <p><strong>Como reproducir:</strong> {{ task.reproSteps }}</p>
       <p><strong>Resultado esperado:</strong> {{ task.expectedResult }}</p>
@@ -45,11 +45,74 @@ import { Task, TaskStatus } from '../../core/models/task.model';
     </article>
   `,
   styles: [`
-    .task-card { border: 1px solid #d2d2d2; border-radius: 6px; padding: 12px; margin-bottom: 10px; background: #fff; }
-    h3 { margin: 0 0 8px; font-size: 15px; }
-    p { margin: 6px 0; font-size: 13px; }
-    .actions, .run-actions { display: flex; gap: 8px; margin-top: 10px; }
-    input, select { flex: 1; }
+    .task-card {
+      border: 1px solid var(--p-content-border-color, #d1d5db);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: var(--p-content-background, #ffffff);
+      color: var(--p-text-color, #111827);
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: var(--p-text-color, #111827);
+    }
+
+    p {
+      margin: 6px 0;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--p-text-color, #111827);
+      overflow-wrap: anywhere;
+    }
+
+    strong {
+      color: var(--p-text-color, #111827);
+    }
+
+    code {
+      display: inline-block;
+      max-width: 100%;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 12px;
+      background: rgba(127, 127, 127, 0.2);
+      color: inherit;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .actions, .run-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    input, select {
+      flex: 1;
+      min-height: 32px;
+      border: 1px solid var(--p-content-border-color, #d1d5db);
+      border-radius: 6px;
+      padding: 0 8px;
+      background: var(--p-content-background, #ffffff);
+      color: var(--p-text-color, #111827);
+    }
+
+    button {
+      min-height: 32px;
+      border: 1px solid var(--p-primary-color, #3b82f6);
+      border-radius: 6px;
+      background: var(--p-primary-color, #3b82f6);
+      color: var(--p-primary-contrast-color, #ffffff);
+      padding: 0 10px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+    }
   `]
 })
 export class TaskCardComponent implements OnChanges {
