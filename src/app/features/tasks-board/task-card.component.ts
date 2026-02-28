@@ -33,6 +33,7 @@ import { TaskResult } from '../../core/models/task-result.enum';
         <div class="bottom-actions">
           @if (task.status === 'waiting') {
             <button type="button" (click)="executeRequested.emit(task)">Ejecutar</button>
+            <button type="button" (click)="editRequested.emit(task)">Editar</button>
             <button type="button" class="danger" (click)="deleteRequested.emit(task)">Eliminar</button>
           }
 
@@ -129,6 +130,7 @@ export class TaskCardComponent {
   @Input({ required: true }) task!: Task;
 
   @Output() executeRequested = new EventEmitter<Task>();
+  @Output() editRequested = new EventEmitter<Task>();
   @Output() deleteRequested = new EventEmitter<Task>();
   @Output() recordOk = new EventEmitter<Task>();
   @Output() recordFailRequested = new EventEmitter<Task>();

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ElectronService } from './electron/electron.service';
 import { Agent, CreateAgentInput } from '../models/agent.model';
-import { CreateTaskInput, Task, TaskStatus } from '../models/task.model';
+import { CreateTaskInput, Task, TaskStatus, UpdateTaskInput } from '../models/task.model';
 import { TaskResult } from '../models/task-result.enum';
 
 @Injectable({
@@ -20,6 +20,10 @@ export class IpcClientService {
 
   async createTask(payload: CreateTaskInput): Promise<number> {
     return this.invoke<number>('tasks:create', [payload]);
+  }
+
+  async updateTask(payload: UpdateTaskInput): Promise<void> {
+    await this.invoke('tasks:update', [payload]);
   }
 
   async createAgent(payload: CreateAgentInput): Promise<number> {

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CreateTaskInput, Task, TaskStatus } from '../models/task.model';
+import { CreateTaskInput, Task, TaskStatus, UpdateTaskInput } from '../models/task.model';
 import { TaskResult } from '../models/task-result.enum';
 import { IpcClientService } from '../services/ipc-client.service';
 
@@ -32,6 +32,11 @@ export class BoardStore {
 
   async createTask(input: CreateTaskInput): Promise<void> {
     await this.ipc.createTask(input);
+    await this.loadTasks();
+  }
+
+  async updateTask(input: UpdateTaskInput): Promise<void> {
+    await this.ipc.updateTask(input);
     await this.loadTasks();
   }
 

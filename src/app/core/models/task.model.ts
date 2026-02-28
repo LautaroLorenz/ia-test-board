@@ -24,3 +24,7 @@ export interface CreateTaskInput {
   reproSteps: string;
   expectedResult: string;
 }
+
+export interface UpdateTaskInput extends CreateTaskInput {
+  taskId: number;
+}

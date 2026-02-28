@@ -54,9 +54,17 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
     expectedResult: ''
   };
   isNewTaskDialogVisible = false;
+  isEditTaskDialogVisible = false;
   isExecuteDialogVisible = false;
   isFailDialogVisible = false;
   selectedTask: Task | null = null;
+  editForm: CreateTaskInput = {
+    title: '',
+    description: '',
+    inputVariablesJson: '{}',
+    reproSteps: '',
+    expectedResult: ''
+  };
   agents: Agent[] = [];
   executeAgentInput: AgentSuggestion | string | null = null;
   executeAgentSuggestions: AgentSuggestion[] = [];
@@ -99,6 +107,44 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
 
   openNewTaskDialog(): void {
     this.isNewTaskDialogVisible = true;
+  }
+
+  openEditTaskDialog(task: Task): void {
+    if (task.status !== 'waiting') {
+      return;
+    }
+
+    this.selectedTask = task;
+    this.editForm = {
+      title: task.title,
+      description: task.description,
+      inputVariablesJson: task.inputVariablesJson,
+      reproSteps: task.reproSteps,
+      expectedResult: task.expectedResult
+    };
+    this.isEditTaskDialogVisible = true;
+  }
+
+  async saveTaskChanges(): Promise<void> {
+    if (!this.selectedTask || this.selectedTask.status !== 'waiting') {
+      return;
+    }
+
+    if (!this.editForm.title.trim()) {
+      return;
+    }
+
+    await this.boardStore.updateTask({
+      taskId: this.selectedTask.id,
+      title: this.editForm.title.trim(),
+      description: this.editForm.description,
+      inputVariablesJson: this.editForm.inputVariablesJson,
+      reproSteps: this.editForm.reproSteps,
+      expectedResult: this.editForm.expectedResult
+    });
+
+    this.isEditTaskDialogVisible = false;
+    this.selectedTask = null;
   }
 
   openExecuteDialog(task: Task): void {

@@ -13,6 +13,10 @@ type TaskCreateInput = {
   expectedResult: string;
 };
 
+type TaskUpdateInput = TaskCreateInput & {
+  taskId: number;
+};
+
 type TaskRow = {
   id: number;
   title: string;
@@ -108,6 +112,23 @@ export function registerTasksIpc(): void {
 
     emitTasksUpdated();
     return id;
+  });
+
+  ipcMain.handle('tasks:update', async (_, payload: TaskUpdateInput) => {
+    const db = getDb();
+    await db('tasks')
+      .where({ id: payload.taskId, status: 'waiting' })
+      .update({
+        title: payload.title,
+        description: payload.description,
+        input_variables_json: payload.inputVariablesJson,
+        repro_steps: payload.reproSteps,
+        expected_result: payload.expectedResult,
+        updated_at: db.fn.now()
+      });
+
+    emitTasksUpdated();
+    return true;
   });
 
   ipcMain.handle('tasks:update-status', async (_, payload: { taskId: number; status: TaskStatus }) => {

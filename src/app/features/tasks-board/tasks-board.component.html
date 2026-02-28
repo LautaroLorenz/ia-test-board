@@ -62,6 +62,44 @@
   </p-dialog>
 
   <p-dialog
+    header="Editar Task"
+    [(visible)]="isEditTaskDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '640px' }">
+    <form class="task-form" (ngSubmit)="saveTaskChanges()">
+      <label for="editTitle">Titulo</label>
+      <input id="editTitle" pInputText name="editTitle" [(ngModel)]="editForm.title" required />
+
+      <label for="editDescription">Descripcion</label>
+      <textarea id="editDescription" pInputTextarea name="editDescription" [(ngModel)]="editForm.description"></textarea>
+
+      <label for="editInputVariablesJson">Variables de entrada (JSON)</label>
+      <textarea
+        id="editInputVariablesJson"
+        pInputTextarea
+        name="editInputVariablesJson"
+        [(ngModel)]="editForm.inputVariablesJson"></textarea>
+
+      <label for="editReproSteps">Pasos para reproducir</label>
+      <textarea id="editReproSteps" pInputTextarea name="editReproSteps" [(ngModel)]="editForm.reproSteps"></textarea>
+
+      <label for="editExpectedResult">Resultado esperado</label>
+      <textarea
+        id="editExpectedResult"
+        pInputTextarea
+        name="editExpectedResult"
+        [(ngModel)]="editForm.expectedResult"></textarea>
+
+      <div class="dialog-actions">
+        <button pButton type="button" label="Cancelar" severity="secondary" (click)="isEditTaskDialogVisible = false"></button>
+        <button pButton type="submit" label="Guardar cambios"></button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <p-dialog
     header="Registrar Falla"
     [(visible)]="isFailDialogVisible"
     [modal]="true"
@@ -85,6 +123,7 @@
         <app-task-card
           [task]="task"
           (executeRequested)="openExecuteDialog($event)"
+          (editRequested)="openEditTaskDialog($event)"
           (deleteRequested)="deleteWaitingTask($event)"
           (recordOk)="registerOk($event)"
           (recordFailRequested)="openFailDialog($event)"
@@ -100,6 +139,7 @@
         <app-task-card
           [task]="task"
           (executeRequested)="openExecuteDialog($event)"
+          (editRequested)="openEditTaskDialog($event)"
           (deleteRequested)="deleteWaitingTask($event)"
           (recordOk)="registerOk($event)"
           (recordFailRequested)="openFailDialog($event)"
@@ -115,6 +155,7 @@
         <app-task-card
           [task]="task"
           (executeRequested)="openExecuteDialog($event)"
+          (editRequested)="openEditTaskDialog($event)"
           (deleteRequested)="deleteWaitingTask($event)"
           (recordOk)="registerOk($event)"
           (recordFailRequested)="openFailDialog($event)"
