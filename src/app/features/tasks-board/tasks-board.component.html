@@ -43,7 +43,17 @@
     [style]="{ width: '420px' }">
     <div class="task-form">
       <label for="executeAgentName">Nombre del agente</label>
-      <input id="executeAgentName" pInputText [(ngModel)]="executeAgentName" />
+      <p-autocomplete
+        inputId="executeAgentName"
+        [(ngModel)]="executeAgentInput"
+        [suggestions]="executeAgentSuggestions"
+        [dropdown]="true"
+        [optionLabel]="'label'"
+        [style]="{ width: '100%' }"
+        [inputStyle]="{ width: '100%' }"
+        (completeMethod)="filterAgentSuggestions($event.query)"
+        (onSelect)="onExecuteAgentSelected($event.value)">
+      </p-autocomplete>
       <div class="dialog-actions">
         <button pButton type="button" label="Cancelar" severity="secondary" (click)="isExecuteDialogVisible = false"></button>
         <button pButton type="button" label="Continuar" (click)="confirmExecuteTask()"></button>

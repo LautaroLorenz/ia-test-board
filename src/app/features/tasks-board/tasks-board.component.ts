@@ -1,15 +1,24 @@
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { map } from 'rxjs';
+import { Subscription, map } from 'rxjs';
+import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
+import { Agent } from '../../core/models/agent.model';
 import { CreateTaskInput, Task } from '../../core/models/task.model';
 import { TaskResult } from '../../core/models/task-result.enum';
+import { AgentsStore } from '../../core/state/agents.store';
 import { BoardStore } from '../../core/state/board.store';
 import { TaskCardComponent } from './task-card.component';
+
+type AgentSuggestion = {
+  label: string;
+  name: string;
+  isCreate: boolean;
+};
 
 @Component({
   selector: 'app-tasks-board',
@@ -21,6 +30,7 @@ import { TaskCardComponent } from './task-card.component';
     TaskCardComponent,
     ButtonModule,
     DialogModule,
+    AutoCompleteModule,
     InputTextModule,
     TextareaModule
   ],
@@ -29,6 +39,7 @@ import { TaskCardComponent } from './task-card.component';
 })
 export class TasksBoardComponent implements OnInit, OnDestroy {
   private readonly boardStore = inject(BoardStore);
+  private readonly agentsStore = inject(AgentsStore);
 
   readonly tasks$ = this.boardStore.tasks$;
   readonly waitingTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'waiting')));
@@ -46,16 +57,26 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
   isExecuteDialogVisible = false;
   isFailDialogVisible = false;
   selectedTask: Task | null = null;
-  executeAgentName = '';
+  agents: Agent[] = [];
+  executeAgentInput: AgentSuggestion | string | null = null;
+  executeAgentSuggestions: AgentSuggestion[] = [];
   failCause = '';
+  private agentsSubscription?: Subscription;
 
   ngOnInit(): void {
     this.boardStore.initialize();
+    this.agentsStore.initialize();
+    this.agentsSubscription = this.agentsStore.agents$.subscribe((agents) => {
+      this.agents = agents;
+    });
     void this.boardStore.loadTasks();
+    void this.loadAgents();
   }
 
   ngOnDestroy(): void {
     this.boardStore.destroy();
+    this.agentsStore.destroy();
+    this.agentsSubscription?.unsubscribe();
   }
 
   async createTask(): Promise<void> {
@@ -82,20 +103,28 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
 
   openExecuteDialog(task: Task): void {
     this.selectedTask = task;
-    this.executeAgentName = task.assignedAgent || '';
+    this.executeAgentInput = task.assignedAgent
+      ? { label: task.assignedAgent, name: task.assignedAgent, isCreate: false }
+      : null;
+    this.executeAgentSuggestions = this.buildAgentSuggestions('');
     this.isExecuteDialogVisible = true;
   }
 
   async confirmExecuteTask(): Promise<void> {
-    if (!this.selectedTask || !this.executeAgentName.trim()) {
+    if (!this.selectedTask) {
       return;
     }
 
-    await this.boardStore.assignAgent(this.selectedTask.id, this.executeAgentName.trim());
+    const agentName = await this.resolveExecuteAgentName();
+    if (!agentName) {
+      return;
+    }
+
+    await this.boardStore.assignAgent(this.selectedTask.id, agentName);
     await this.boardStore.updateStatus(this.selectedTask.id, 'executing');
     this.isExecuteDialogVisible = false;
     this.selectedTask = null;
-    this.executeAgentName = '';
+    this.executeAgentInput = null;
   }
 
   async registerOk(task: Task): Promise<void> {
@@ -145,6 +174,81 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
   async resetTask(task: Task): Promise<void> {
     await this.boardStore.assignAgent(task.id, null);
     await this.boardStore.updateStatus(task.id, 'waiting');
+  }
+
+  filterAgentSuggestions(query: string): void {
+    this.executeAgentSuggestions = this.buildAgentSuggestions(query);
+  }
+
+  async onExecuteAgentSelected(selected: AgentSuggestion | string): Promise<void> {
+    if (typeof selected === 'string') {
+      return;
+    }
+
+    if (!selected.isCreate) {
+      this.executeAgentInput = selected;
+      return;
+    }
+
+    const createdName = await this.ensureAgentExists(selected.name);
+    this.executeAgentInput = { label: createdName, name: createdName, isCreate: false };
+    this.executeAgentSuggestions = this.buildAgentSuggestions(createdName);
+  }
+
+  private async loadAgents(): Promise<void> {
+    await this.agentsStore.loadAgents();
+  }
+
+  private buildAgentSuggestions(rawQuery: string): AgentSuggestion[] {
+    const query = rawQuery.trim().toLowerCase();
+    const suggestions = this.agents
+      .filter((agent) => !query || agent.name.toLowerCase().includes(query))
+      .map((agent) => ({ label: agent.name, name: agent.name, isCreate: false }));
+
+    const exactMatch = this.agents.some((agent) => agent.name.toLowerCase() === query);
+    if (query && !exactMatch) {
+      suggestions.push({
+        label: `Crear "${rawQuery.trim()}"`,
+        name: rawQuery.trim(),
+        isCreate: true,
+      });
+    }
+
+    return suggestions;
+  }
+
+  private async resolveExecuteAgentName(): Promise<string | null> {
+    if (!this.executeAgentInput) {
+      return null;
+    }
+
+    if (typeof this.executeAgentInput === 'string') {
+      const typedName = this.executeAgentInput.trim();
+      if (!typedName) {
+        return null;
+      }
+      return this.ensureAgentExists(typedName);
+    }
+
+    if (this.executeAgentInput.isCreate) {
+      return this.ensureAgentExists(this.executeAgentInput.name);
+    }
+
+    return this.executeAgentInput.name;
+  }
+
+  private async ensureAgentExists(name: string): Promise<string> {
+    const normalizedName = name.trim();
+    const existing = this.agents.find(
+      (agent) => agent.name.toLowerCase() === normalizedName.toLowerCase(),
+    );
+    if (existing) {
+      return existing.name;
+    }
+
+    await this.agentsStore.createAgent({ name: normalizedName });
+    await this.loadAgents();
+    return normalizedName;
   }
 
 }
