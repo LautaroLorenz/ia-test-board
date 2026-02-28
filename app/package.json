@@ -1,6 +1,6 @@
 {
-  "name": "angular-electron",
-  "description": "Angular Electron sample",
+  "name": "ia-test-board-main",
+  "description": "Electron main process for ia-test-board",
   "author": {
     "name": "Maxime GRIS",
     "email": "maxime.gris@gmail.com"

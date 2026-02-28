@@ -11,8 +11,8 @@ import { SharedModule } from './app/shared/shared.module';
 import {provideTranslateService} from '@ngx-translate/core';
 import {provideTranslateHttpLoader} from '@ngx-translate/http-loader';
 import { PageNotFoundComponent } from './app/shared/components';
-import { HomeComponent } from './app/home/home.component';
-import { DetailComponent } from './app/detail/detail.component';
+import { TasksBoardComponent } from './app/features/tasks-board/tasks-board.component';
+import { RealtimeStatusComponent } from './app/features/realtime-status/realtime-status.component';
 
 if (APP_CONFIG.production) {
   enableProdMode();
@@ -32,16 +32,16 @@ bootstrapApplication(AppComponent, {
     provideRouter([
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'tasks-board',
         pathMatch: 'full'
       },
       {
-        path: 'home',
-        component: HomeComponent
+        path: 'tasks-board',
+        component: TasksBoardComponent
       },
       {
-        path: 'detail',
-        component: DetailComponent
+        path: 'realtime-status',
+        component: RealtimeStatusComponent
       },
       {
         path: '**',

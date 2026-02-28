@@ -1,0 +1,59 @@
+<section class="page">
+  <h1>Tasks Board</h1>
+
+  <form class="task-form" (ngSubmit)="createTask()">
+    <input name="title" [(ngModel)]="form.title" placeholder="Titulo de la task" required />
+    <textarea name="description" [(ngModel)]="form.description" placeholder="Descripcion"></textarea>
+    <textarea name="inputVariablesJson" [(ngModel)]="form.inputVariablesJson" placeholder='Variables de entrada (JSON)'></textarea>
+    <textarea name="reproSteps" [(ngModel)]="form.reproSteps" placeholder="Pasos para reproducir"></textarea>
+    <textarea name="expectedResult" [(ngModel)]="form.expectedResult" placeholder="Resultado esperado"></textarea>
+    <button type="submit">Crear Task</button>
+  </form>
+
+  <div class="run-toolbar">
+    <button type="button" (click)="startRunGroup()">Iniciar corrida</button>
+    <button type="button" (click)="finishRunGroup()">Finalizar corrida</button>
+    <span>Run Group Activo: {{ (runGroupId$ | async) ?? 'ninguno' }}</span>
+  </div>
+
+  <section class="columns">
+    <div class="column">
+      <h2>En espera</h2>
+      @for (task of (waitingTasks$ | async); track task.id) {
+        <app-task-card
+          [task]="task"
+          (statusChange)="changeStatus($event)"
+          (assignAgent)="assignAgent($event)"
+          (recordOk)="recordOk($event)"
+          (recordFail)="recordFail($event)">
+        </app-task-card>
+      }
+    </div>
+
+    <div class="column">
+      <h2>En ejecucion</h2>
+      @for (task of (inProgressTasks$ | async); track task.id) {
+        <app-task-card
+          [task]="task"
+          (statusChange)="changeStatus($event)"
+          (assignAgent)="assignAgent($event)"
+          (recordOk)="recordOk($event)"
+          (recordFail)="recordFail($event)">
+        </app-task-card>
+      }
+    </div>
+
+    <div class="column">
+      <h2>Ejecutando</h2>
+      @for (task of (executingTasks$ | async); track task.id) {
+        <app-task-card
+          [task]="task"
+          (statusChange)="changeStatus($event)"
+          (assignAgent)="assignAgent($event)"
+          (recordOk)="recordOk($event)"
+          (recordFail)="recordFail($event)">
+        </app-task-card>
+      }
+    </div>
+  </section>
+</section>

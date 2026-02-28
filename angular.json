@@ -3,12 +3,13 @@
   "cli": {
     "schematicCollections": [
       "@angular-eslint/schematics"
-    ]
+    ],
+    "analytics": false
   },
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "angular-electron": {
+    "ia-test-board": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -84,21 +85,21 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "buildTarget": "angular-electron:build"
+              "buildTarget": "ia-test-board:build"
           },
           "configurations": {
             "dev": {
-              "buildTarget": "angular-electron:build:dev"
+              "buildTarget": "ia-test-board:build:dev"
             },
             "production": {
-              "buildTarget": "angular-electron:build:production"
+              "buildTarget": "ia-test-board:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n",
           "options": {
-            "buildTarget": "angular-electron:build"
+            "buildTarget": "ia-test-board:build"
           }
         },
         "test": {
@@ -109,7 +110,7 @@
             "browsers": [
               "chromium"
             ],
-            "buildTarget": "angular-electron:build:testing",
+            "buildTarget": "ia-test-board:build:testing",
             "coverage": true,
             "coverageReporters": [
               "html",
@@ -137,7 +138,7 @@
         }
       }
     },
-    "angular-electron-e2e": {
+    "ia-test-board-e2e": {
       "root": "e2e",
       "projectType": "application",
       "architect": {

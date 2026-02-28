@@ -1,0 +1,38 @@
+.page {
+  padding: 16px;
+}
+
+h1 {
+  margin-bottom: 12px;
+}
+
+.task-form {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.task-form textarea {
+  min-height: 48px;
+}
+
+.run-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.column {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f8f8f8;
+  min-height: 300px;
+}

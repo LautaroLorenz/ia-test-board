@@ -1,8 +1,8 @@
 {
-  "name": "angular-electron",
+  "name": "ia-test-board",
   "version": "17.0.0",
-  "description": "Angular 21 with Electron 40 (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/belnadris/angular-electron",
+  "description": "Desktop test board with Angular, Electron, SQLite and Knex",
+  "homepage": "",
   "author": {
     "name": "Maxime GRIS",
     "email": "maxime.gris@gmail.com"
@@ -28,7 +28,7 @@
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "npm-run-all -p electron:serve ng:serve",
-    "ng:serve": "ng serve -c dev -o",
+    "ng:serve": "ng serve -c dev",
     "build": "npm run electron:serve-tsc && ng build --base-href ./",
     "web:dev": "npm run build",
     "web:prod": "npm run build -- -c production",
@@ -36,7 +36,7 @@
     "electron:serve-tsc": "tsc -p tsconfig.serve.json",
     "electron:serve-tsc:watch": "tsc -p tsconfig.serve.json --watch --preserveWatchOutput",
     "electron:start": "electron . --serve",
-    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npm-run-all -p electron:serve-tsc:watch electron:start",
+    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && electron . --serve",
     "electron:local": "npm run web:dev && electron .",
     "electron:build": "npm run web:prod && electron-builder build --publish=never",
     "test": "ng test --watch=false",
@@ -44,7 +44,9 @@
     "e2e": "npm run web:prod && playwright test -c e2e/playwright.config.ts e2e/",
     "e2e:show-trace": "playwright show-trace e2e/tracing/trace.zip",
     "version": "conventional-changelog -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "db:migrate": "node app/db/migrate.js",
+    "db:seed": "node app/db/seed.js"
   },
   "dependencies": {
     "@angular/common": "21.2.0",
@@ -55,7 +57,9 @@
     "@angular/platform-browser": "21.2.0",
     "@angular/platform-browser-dynamic": "21.2.0",
     "@angular/router": "21.2.0",
+    "knex": "3.1.0",
     "rxjs": "7.8.2",
+    "sqlite3": "5.1.7",
     "tslib": "2.8.1",
     "zone.js": "0.16.1"
   },

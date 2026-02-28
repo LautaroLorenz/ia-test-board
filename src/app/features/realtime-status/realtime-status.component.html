@@ -1,0 +1,21 @@
+<section class="page">
+  <h1>Real Time Status</h1>
+
+  @if (summary$ | async; as summary) {
+    <p><strong>Ultima corrida terminada:</strong> {{ summary.runGroupId ?? 'Sin corridas finalizadas' }}</p>
+    <p><strong>Cantidad de OK:</strong> {{ summary.okCount }}</p>
+    <p><strong>Cantidad de fallos:</strong> {{ summary.failCount }}</p>
+
+    <h2>Top 5 causas de fallo</h2>
+    <ul>
+      @for (item of summary.topFailureCauses; track item.cause) {
+        <li>
+          {{ item.cause }} ({{ item.count }})
+        </li>
+      }
+    </ul>
+    @if (summary.topFailureCauses.length === 0) {
+      <p>No hay fallos para mostrar.</p>
+    }
+  }
+</section>

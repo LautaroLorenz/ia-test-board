@@ -56,3 +56,5 @@ Thumbs.db
 CLAUDE.local.md
 
 .worktrees
+app/db/data
+*.sqlite3

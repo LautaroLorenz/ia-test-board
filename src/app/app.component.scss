@@ -1,3 +1,20 @@
 :host {
-  
+  display: block;
+}
+
+.top-nav {
+  display: flex;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.top-nav a {
+  text-decoration: none;
+  color: #2d2d2d;
+  font-weight: 600;
+}
+
+.top-nav a.active {
+  color: #0a66c2;
 }
