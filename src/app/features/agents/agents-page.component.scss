@@ -1,0 +1,36 @@
+.page {
+  padding: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+h1 {
+  margin: 0;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.agent-form {
+  display: grid;
+  gap: 8px;
+}
+
+.agent-form label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}

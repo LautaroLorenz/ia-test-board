@@ -1,0 +1,64 @@
+<section class="page">
+  <div class="page-header">
+    <h1>Agentes</h1>
+    <button pButton type="button" label="Nuevo agente" icon="pi pi-plus" (click)="openCreateDialog()"></button>
+  </div>
+
+  <p-table [value]="(agents$ | async) ?? []" [tableStyle]="{ 'min-width': '32rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 120px;">ID</th>
+        <th>Nombre</th>
+        <th style="width: 220px;">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-agent>
+      <tr>
+        <td>{{ agent.id }}</td>
+        <td>{{ agent.name }}</td>
+        <td class="actions-cell">
+          <button
+            pButton
+            type="button"
+            label="Editar"
+            icon="pi pi-pencil"
+            severity="secondary"
+            (click)="openEditDialog(agent)">
+          </button>
+          <button
+            pButton
+            type="button"
+            label="Eliminar"
+            icon="pi pi-trash"
+            severity="danger"
+            (click)="deleteAgent(agent)">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog
+    [header]="editingAgent ? 'Editar agente' : 'Nuevo agente'"
+    [(visible)]="isDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '420px' }">
+    <form class="agent-form" (ngSubmit)="saveAgent()">
+      <label for="name">Nombre</label>
+      <input id="name" pInputText name="name" [(ngModel)]="formName" required />
+
+      <div class="dialog-actions">
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          (click)="isDialogVisible = false">
+        </button>
+        <button pButton type="submit" [label]="editingAgent ? 'Guardar' : 'Crear'"></button>
+      </div>
+    </form>
+  </p-dialog>
+</section>

@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { initDatabase } from './db/connection';
 import { registerTasksIpc } from './ipc/tasks.ipc';
 import { registerRunsIpc } from './ipc/runs.ipc';
+import { registerAgentsIpc } from './ipc/agents.ipc';
 import { setMainWindow } from './ipc/events';
 
 let win: BrowserWindow | null = null;
@@ -82,6 +83,7 @@ try {
   ipcMain.handle('app:get-version', () => app.getVersion());
   registerTasksIpc();
   registerRunsIpc();
+  registerAgentsIpc();
 
   app.on('ready', async () => {
     try {

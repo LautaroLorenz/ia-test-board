@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ElectronService } from './electron/electron.service';
+import { Agent, CreateAgentInput } from '../models/agent.model';
 import { CreateTaskInput, Task, TaskStatus } from '../models/task.model';
 import { TaskResult } from '../models/task-result.enum';
 
@@ -13,8 +14,16 @@ export class IpcClientService {
     return this.invoke<Task[]>('tasks:list', []);
   }
 
+  async listAgents(): Promise<Agent[]> {
+    return this.invoke<Agent[]>('agents:list', []);
+  }
+
   async createTask(payload: CreateTaskInput): Promise<number> {
     return this.invoke<number>('tasks:create', [payload]);
+  }
+
+  async createAgent(payload: CreateAgentInput): Promise<number> {
+    return this.invoke<number>('agents:create', [payload]);
   }
 
   async updateTaskStatus(taskId: number, status: TaskStatus): Promise<void> {
@@ -27,6 +36,14 @@ export class IpcClientService {
 
   async deleteTask(taskId: number): Promise<void> {
     await this.invoke('tasks:delete', [{ taskId }]);
+  }
+
+  async updateAgent(agentId: number, name: string): Promise<void> {
+    await this.invoke('agents:update', [{ agentId, name }]);
+  }
+
+  async deleteAgent(agentId: number): Promise<void> {
+    await this.invoke('agents:delete', [{ agentId }]);
   }
 
   async recordRun(payload: {
@@ -42,6 +59,10 @@ export class IpcClientService {
 
   onTasksUpdated(callback: () => void): () => void {
     return this.listen('tasks:updated', callback);
+  }
+
+  onAgentsUpdated(callback: () => void): () => void {
+    return this.listen('agents:updated', callback);
   }
 
   private async invoke<T>(channel: string, args: unknown[]): Promise<T> {

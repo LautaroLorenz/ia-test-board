@@ -18,6 +18,7 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { PageNotFoundComponent } from './app/shared/components';
 import { TasksBoardComponent } from './app/features/tasks-board/tasks-board.component';
+import { AgentsPageComponent } from './app/features/agents/agents-page.component';
 
 if (APP_CONFIG.production) {
   enableProdMode();
@@ -52,10 +53,14 @@ bootstrapApplication(AppComponent, {
         component: TasksBoardComponent,
       },
       {
+        path: 'agents',
+        component: AgentsPageComponent,
+      },
+      {
         path: '**',
         component: PageNotFoundComponent,
       },
     ]),
     importProvidersFrom(CoreModule, SharedModule),
   ],
-}).catch((err) => console.error(err));
+}).catch((err: unknown) => console.error(err));
