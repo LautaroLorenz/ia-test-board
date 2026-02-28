@@ -10,6 +10,7 @@ import { TaskResult } from '../../core/models/task-result.enum';
   template: `
     <article class="task-card">
       <h3>{{ task.title }}</h3>
+      <p><strong>ID:</strong> {{ task.id }}</p>
       <p><strong>Descripcion:</strong> {{ task.description || '-' }}</p>
       <p><strong>Variables:</strong> <code>{{ task.inputVariablesJson }}</code></p>
       <p><strong>Como reproducir:</strong> {{ task.reproSteps }}</p>
