@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Subscription, map } from 'rxjs';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
@@ -29,17 +31,20 @@ type AgentSuggestion = {
     AsyncPipe,
     TaskCardComponent,
     ButtonModule,
+    ConfirmDialogModule,
     DialogModule,
     AutoCompleteModule,
     InputTextModule,
     TextareaModule
   ],
+  providers: [ConfirmationService],
   templateUrl: './tasks-board.component.html',
   styleUrl: './tasks-board.component.scss'
 })
 export class TasksBoardComponent implements OnInit, OnDestroy {
   private readonly boardStore = inject(BoardStore);
   private readonly agentsStore = inject(AgentsStore);
+  private readonly confirmationService = inject(ConfirmationService);
 
   readonly tasks$ = this.boardStore.tasks$;
   readonly waitingTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'waiting')));
@@ -179,7 +184,7 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
   }
 
   async deleteWaitingTask(task: Task): Promise<void> {
-    const confirmed = window.confirm(`Eliminar la task "${task.title}"?`);
+    const confirmed = await this.confirmAction(`Eliminar la task "${task.title}"?`);
     if (!confirmed) {
       return;
     }
@@ -187,7 +192,7 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
   }
 
   async skipExecutingTask(task: Task): Promise<void> {
-    const confirmed = window.confirm(`Hacer skip de la task "${task.title}"?`);
+    const confirmed = await this.confirmAction(`Hacer skip de la task "${task.title}"?`);
     if (!confirmed) {
       return;
     }
@@ -295,6 +300,31 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
     await this.agentsStore.createAgent({ name: normalizedName });
     await this.loadAgents();
     return normalizedName;
+  }
+
+  private confirmAction(message: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      let resolved = false;
+      const finish = (value: boolean): void => {
+        if (resolved) {
+          return;
+        }
+        resolved = true;
+        resolve(value);
+      };
+
+      this.confirmationService.confirm({
+        header: 'Confirmar accion',
+        message,
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Aceptar',
+        rejectLabel: 'Cancelar',
+        closeOnEscape: true,
+        dismissableMask: true,
+        accept: () => finish(true),
+        reject: () => finish(false),
+      });
+    });
   }
 
 }
