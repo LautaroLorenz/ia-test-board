@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { getDb } from '../db/connection';
 import { emitStatusUpdated, emitTasksUpdated } from './events';
 
-type TaskStatus = 'waiting' | 'in_progress' | 'executing';
+type TaskStatus = 'waiting' | 'executing' | 'finished';
 
 type TaskCreateInput = {
   title: string;
@@ -19,7 +19,7 @@ type TaskRow = {
   input_variables_json: string;
   repro_steps: string;
   expected_result: string;
-  status: TaskStatus;
+  status: string;
   assigned_agent: string | null;
   created_at: string;
   updated_at: string;
@@ -28,6 +28,19 @@ type TaskRow = {
 };
 
 export function registerTasksIpc(): void {
+  const normalizeStatus = (status: string): TaskStatus => {
+    if (status === 'in_progress') {
+      return 'executing';
+    }
+    if (status === 'finalizado' || status === 'finalized') {
+      return 'finished';
+    }
+    if (status === 'finished' || status === 'executing' || status === 'waiting') {
+      return status;
+    }
+    return 'waiting';
+  };
+
   ipcMain.handle('tasks:list', async () => {
     const db = getDb();
 
@@ -69,7 +82,7 @@ export function registerTasksIpc(): void {
       inputVariablesJson: row.input_variables_json,
       reproSteps: row.repro_steps,
       expectedResult: row.expected_result,
-      status: row.status,
+      status: normalizeStatus(row.status),
       assignedAgent: row.assigned_agent,
       latestResult: latestByTaskId.get(row.id)?.latest_result ?? null,
       latestFailureCause: latestByTaskId.get(row.id)?.latest_failure_cause ?? null,

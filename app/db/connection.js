@@ -32,7 +32,13 @@ function getDb() {
 function initDatabase() {
     return __awaiter(this, void 0, void 0, function* () {
         const db = getDb();
-        yield db.migrate.latest();
+        const [batchNo, migrations] = yield db.migrate.latest();
+        if (migrations.length > 0) {
+            console.log(`[db] Applied ${migrations.length} migration(s) in batch ${batchNo}: ${migrations.join(', ')}`);
+        }
+        else {
+            console.log('[db] Schema is up to date.');
+        }
     });
 }
 //# sourceMappingURL=connection.js.map

@@ -29,8 +29,8 @@ import { Task, TaskStatus } from '../../core/models/task.model';
       <div class="actions">
         <select [ngModel]="task.status" (ngModelChange)="onStatusChange($event)">
           <option value="waiting">En espera</option>
-          <option value="in_progress">En ejecucion</option>
           <option value="executing">Ejecutando</option>
+          <option value="finished">Finalizado</option>
         </select>
         <input [(ngModel)]="agentName" placeholder="agente" />
         <button type="button" (click)="assignAgent.emit({ taskId: task.id, agentName: agentName || null })">

@@ -23,5 +23,11 @@ export function getDb(): Knex {
 
 export async function initDatabase(): Promise<void> {
   const db = getDb();
-  await db.migrate.latest();
+  const [batchNo, migrations] = await db.migrate.latest();
+
+  if (migrations.length > 0) {
+    console.log(`[db] Applied ${migrations.length} migration(s) in batch ${batchNo}: ${migrations.join(', ')}`);
+  } else {
+    console.log('[db] Schema is up to date.');
+  }
 }

@@ -12,7 +12,7 @@ Aplicacion de escritorio para seguimiento de testing continuo, construida con El
 ## Pantallas
 
 - `Tasks Board`
-  - columnas: `En espera`, `En ejecucion`, `Ejecutando`
+  - columnas: `En espera`, `Ejecutando`, `Finalizado`
   - cards con:
     - ultimo resultado (`OK` o `Falla + causa`)
     - variables de entrada

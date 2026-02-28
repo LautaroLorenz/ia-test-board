@@ -84,8 +84,13 @@ try {
   registerStatusIpc();
 
   app.on('ready', async () => {
-    await initDatabase();
-    setTimeout(createWindow, 400);
+    try {
+      await initDatabase();
+      setTimeout(createWindow, 400);
+    } catch (error) {
+      console.error('[db] Failed to initialize database:', error);
+      app.quit();
+    }
   });
 
   app.on('window-all-closed', () => {

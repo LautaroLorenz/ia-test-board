@@ -31,8 +31,8 @@
     </div>
 
     <div class="column">
-      <h2>En ejecucion</h2>
-      @for (task of (inProgressTasks$ | async); track task.id) {
+      <h2>Ejecutando</h2>
+      @for (task of (executingTasks$ | async); track task.id) {
         <app-task-card
           [task]="task"
           (statusChange)="changeStatus($event)"
@@ -44,8 +44,8 @@
     </div>
 
     <div class="column">
-      <h2>Ejecutando</h2>
-      @for (task of (executingTasks$ | async); track task.id) {
+      <h2>Finalizado</h2>
+      @for (task of (finishedTasks$ | async); track task.id) {
         <app-task-card
           [task]="task"
           (statusChange)="changeStatus($event)"

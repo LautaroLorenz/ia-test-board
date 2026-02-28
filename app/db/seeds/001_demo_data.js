@@ -19,7 +19,7 @@ exports.seed = async function seed(knex) {
     input_variables_json: JSON.stringify({ username: 'demo', password: '***' }),
     repro_steps: '1. Abrir login. 2. Ingresar credenciales validas. 3. Enviar formulario.',
     expected_result: 'El usuario accede al dashboard sin errores.',
-    status: 'waiting',
+    status: 'finished',
     assigned_agent: null,
     created_at: knex.fn.now(),
     updated_at: knex.fn.now()

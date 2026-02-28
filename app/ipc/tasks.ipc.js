@@ -14,6 +14,18 @@ const electron_1 = require("electron");
 const connection_1 = require("../db/connection");
 const events_1 = require("./events");
 function registerTasksIpc() {
+    const normalizeStatus = (status) => {
+        if (status === 'in_progress') {
+            return 'executing';
+        }
+        if (status === 'finalizado' || status === 'finalized') {
+            return 'finished';
+        }
+        if (status === 'finished' || status === 'executing' || status === 'waiting') {
+            return status;
+        }
+        return 'waiting';
+    };
     electron_1.ipcMain.handle('tasks:list', () => __awaiter(this, void 0, void 0, function* () {
         const db = (0, connection_1.getDb)();
         const rows = yield db('tasks')
@@ -42,7 +54,7 @@ function registerTasksIpc() {
                 inputVariablesJson: row.input_variables_json,
                 reproSteps: row.repro_steps,
                 expectedResult: row.expected_result,
-                status: row.status,
+                status: normalizeStatus(row.status),
                 assignedAgent: row.assigned_agent,
                 latestResult: (_b = (_a = latestByTaskId.get(row.id)) === null || _a === void 0 ? void 0 : _a.latest_result) !== null && _b !== void 0 ? _b : null,
                 latestFailureCause: (_d = (_c = latestByTaskId.get(row.id)) === null || _c === void 0 ? void 0 : _c.latest_failure_cause) !== null && _d !== void 0 ? _d : null,

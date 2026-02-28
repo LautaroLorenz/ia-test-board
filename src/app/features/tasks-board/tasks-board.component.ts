@@ -19,8 +19,8 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
   readonly tasks$ = this.boardStore.tasks$;
   readonly runGroupId$ = this.boardStore.activeRunGroupId$;
   readonly waitingTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'waiting')));
-  readonly inProgressTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'in_progress')));
   readonly executingTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'executing')));
+  readonly finishedTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'finished')));
 
   form: CreateTaskInput = {
     title: '',
@@ -56,7 +56,7 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
     };
   }
 
-  async changeStatus(payload: { taskId: number; status: 'waiting' | 'in_progress' | 'executing' }): Promise<void> {
+  async changeStatus(payload: { taskId: number; status: 'waiting' | 'executing' | 'finished' }): Promise<void> {
     await this.boardStore.updateStatus(payload.taskId, payload.status);
   }
 
