@@ -34,11 +34,39 @@
     </form>
   </p-dialog>
 
-  <div class="run-toolbar">
-    <button pButton type="button" label="Iniciar corrida" (click)="startRunGroup()"></button>
-    <button pButton type="button" label="Finalizar corrida" severity="secondary" (click)="finishRunGroup()"></button>
-    <span>Run Group Activo: {{ (runGroupId$ | async) ?? 'ninguno' }}</span>
-  </div>
+  <p-dialog
+    header="Ejecutar Task"
+    [(visible)]="isExecuteDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '420px' }">
+    <div class="task-form">
+      <label for="executeAgentName">Nombre del agente</label>
+      <input id="executeAgentName" pInputText [(ngModel)]="executeAgentName" />
+      <div class="dialog-actions">
+        <button pButton type="button" label="Cancelar" severity="secondary" (click)="isExecuteDialogVisible = false"></button>
+        <button pButton type="button" label="Continuar" (click)="confirmExecuteTask()"></button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+    header="Registrar Falla"
+    [(visible)]="isFailDialogVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '520px' }">
+    <div class="task-form">
+      <label for="failCause">Causa</label>
+      <textarea id="failCause" pInputTextarea [(ngModel)]="failCause"></textarea>
+      <div class="dialog-actions">
+        <button pButton type="button" label="Cancelar" severity="secondary" (click)="isFailDialogVisible = false"></button>
+        <button pButton type="button" label="Continuar" (click)="confirmFailTask()"></button>
+      </div>
+    </div>
+  </p-dialog>
 
   <section class="columns">
     <div class="column">
@@ -46,10 +74,9 @@
       @for (task of (waitingTasks$ | async); track task.id) {
         <app-task-card
           [task]="task"
-          (statusChange)="changeStatus($event)"
-          (assignAgent)="assignAgent($event)"
-          (recordOk)="recordOk($event)"
-          (recordFail)="recordFail($event)">
+          (executeRequested)="openExecuteDialog($event)"
+          (recordOk)="registerOk($event)"
+          (recordFailRequested)="openFailDialog($event)">
         </app-task-card>
       }
     </div>
@@ -59,10 +86,9 @@
       @for (task of (executingTasks$ | async); track task.id) {
         <app-task-card
           [task]="task"
-          (statusChange)="changeStatus($event)"
-          (assignAgent)="assignAgent($event)"
-          (recordOk)="recordOk($event)"
-          (recordFail)="recordFail($event)">
+          (executeRequested)="openExecuteDialog($event)"
+          (recordOk)="registerOk($event)"
+          (recordFailRequested)="openFailDialog($event)">
         </app-task-card>
       }
     </div>
@@ -72,10 +98,9 @@
       @for (task of (finishedTasks$ | async); track task.id) {
         <app-task-card
           [task]="task"
-          (statusChange)="changeStatus($event)"
-          (assignAgent)="assignAgent($event)"
-          (recordOk)="recordOk($event)"
-          (recordFail)="recordFail($event)">
+          (executeRequested)="openExecuteDialog($event)"
+          (recordOk)="registerOk($event)"
+          (recordFailRequested)="openFailDialog($event)">
         </app-task-card>
       }
     </div>

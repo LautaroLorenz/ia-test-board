@@ -9,11 +9,3 @@ export function setMainWindow(window: BrowserWindow | null): void {
 export function emitTasksUpdated(): void {
   mainWindow?.webContents.send('tasks:updated');
 }
-
-export function emitRunsUpdated(): void {
-  mainWindow?.webContents.send('runs:updated');
-}
-
-export function emitStatusUpdated(): void {
-  mainWindow?.webContents.send('status:updated');
-}

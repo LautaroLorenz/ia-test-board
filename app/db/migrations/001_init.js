@@ -15,24 +15,12 @@ exports.up = async function up(knex) {
     table.timestamp('updated_at').notNullable().defaultTo(knex.fn.now());
   });
 
-  await knex.schema.createTable('run_groups', table => {
-    table.increments('id').primary();
-    table.timestamp('started_at').notNullable().defaultTo(knex.fn.now());
-    table.timestamp('finished_at').nullable();
-    table.string('triggered_by').nullable();
-    table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
-  });
-
   await knex.schema.createTable('task_runs', table => {
     table.increments('id').primary();
     table.integer('task_id').unsigned().notNullable()
       .references('id')
       .inTable('tasks')
       .onDelete('CASCADE');
-    table.integer('run_group_id').unsigned().nullable()
-      .references('id')
-      .inTable('run_groups')
-      .onDelete('SET NULL');
     table.timestamp('started_at').notNullable().defaultTo(knex.fn.now());
     table.timestamp('finished_at').notNullable().defaultTo(knex.fn.now());
     table.string('result').notNullable();
@@ -49,6 +37,5 @@ exports.up = async function up(knex) {
  */
 exports.down = async function down(knex) {
   await knex.schema.dropTableIfExists('task_runs');
-  await knex.schema.dropTableIfExists('run_groups');
   await knex.schema.dropTableIfExists('tasks');
 };

@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { getDb } from '../db/connection';
-import { emitStatusUpdated, emitTasksUpdated } from './events';
+import { emitTasksUpdated } from './events';
 
 type TaskStatus = 'waiting' | 'executing' | 'finished';
 
@@ -119,7 +119,6 @@ export function registerTasksIpc(): void {
       });
 
     emitTasksUpdated();
-    emitStatusUpdated();
     return true;
   });
 

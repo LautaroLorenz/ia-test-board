@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { initDatabase } from './db/connection';
 import { registerTasksIpc } from './ipc/tasks.ipc';
-import { registerStatusIpc } from './ipc/status.ipc';
+import { registerRunsIpc } from './ipc/runs.ipc';
 import { setMainWindow } from './ipc/events';
 
 let win: BrowserWindow | null = null;
@@ -81,7 +81,7 @@ try {
 
   ipcMain.handle('app:get-version', () => app.getVersion());
   registerTasksIpc();
-  registerStatusIpc();
+  registerRunsIpc();
 
   app.on('ready', async () => {
     try {

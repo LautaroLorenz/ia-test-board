@@ -34,13 +34,6 @@ h1 {
   margin-top: 8px;
 }
 
-.run-toolbar {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
 .columns {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

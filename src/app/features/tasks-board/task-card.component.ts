@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Task, TaskStatus } from '../../core/models/task.model';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Task } from '../../core/models/task.model';
 
 @Component({
   selector: 'app-task-card',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   template: `
     <article class="task-card">
       <h3>{{ task.title }}</h3>
@@ -26,22 +25,18 @@ import { Task, TaskStatus } from '../../core/models/task.model';
         }
       </p>
 
-      <div class="actions">
-        <select [ngModel]="task.status" (ngModelChange)="onStatusChange($event)">
-          <option value="waiting">En espera</option>
-          <option value="executing">Ejecutando</option>
-          <option value="finished">Finalizado</option>
-        </select>
-        <input [(ngModel)]="agentName" placeholder="agente" />
-        <button type="button" (click)="assignAgent.emit({ taskId: task.id, agentName: agentName || null })">
-          Asignar
-        </button>
-      </div>
+      @if (task.status === 'waiting' || task.status === 'executing') {
+        <div class="bottom-actions">
+          @if (task.status === 'waiting') {
+            <button type="button" (click)="executeRequested.emit(task)">Ejecutar</button>
+          }
 
-      <div class="run-actions">
-        <button type="button" (click)="recordOk.emit(task)">Registrar OK</button>
-        <button type="button" (click)="onRecordFail()">Registrar Falla</button>
-      </div>
+          @if (task.status === 'executing') {
+            <button type="button" (click)="recordOk.emit(task)">Registrar OK</button>
+            <button type="button" (click)="recordFailRequested.emit(task)">Registrar Falla</button>
+          }
+        </div>
+      }
     </article>
   `,
   styles: [`
@@ -84,20 +79,10 @@ import { Task, TaskStatus } from '../../core/models/task.model';
       white-space: pre-wrap;
     }
 
-    .actions, .run-actions {
+    .bottom-actions {
       display: flex;
       gap: 8px;
       margin-top: 10px;
-    }
-
-    input, select {
-      flex: 1;
-      min-height: 32px;
-      border: 1px solid var(--p-content-border-color, #d1d5db);
-      border-radius: 6px;
-      padding: 0 8px;
-      background: var(--p-content-background, #ffffff);
-      color: var(--p-text-color, #111827);
     }
 
     button {
@@ -115,26 +100,10 @@ import { Task, TaskStatus } from '../../core/models/task.model';
     }
   `]
 })
-export class TaskCardComponent implements OnChanges {
+export class TaskCardComponent {
   @Input({ required: true }) task!: Task;
 
-  @Output() statusChange = new EventEmitter<{ taskId: number; status: TaskStatus }>();
-  @Output() assignAgent = new EventEmitter<{ taskId: number; agentName: string | null }>();
+  @Output() executeRequested = new EventEmitter<Task>();
   @Output() recordOk = new EventEmitter<Task>();
-  @Output() recordFail = new EventEmitter<{ task: Task; cause: string | null }>();
-
-  agentName = '';
-
-  ngOnChanges(): void {
-    this.agentName = this.task.assignedAgent || '';
-  }
-
-  onStatusChange(status: TaskStatus): void {
-    this.statusChange.emit({ taskId: this.task.id, status });
-  }
-
-  onRecordFail(): void {
-    const cause = window.prompt('Causa de fallo', this.task.latestFailureCause || '') || null;
-    this.recordFail.emit({ task: this.task, cause });
-  }
+  @Output() recordFailRequested = new EventEmitter<Task>();
 }

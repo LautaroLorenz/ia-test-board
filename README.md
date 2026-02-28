@@ -19,11 +19,6 @@ Aplicacion de escritorio para seguimiento de testing continuo, construida con El
     - pasos de reproduccion
     - resultado esperado
     - agente asignado
-- `Real Time Status`
-  - ultima corrida terminada:
-    - cantidad de fallos
-    - cantidad de OK
-    - top 5 causas de fallo
 
 ## Scripts
 

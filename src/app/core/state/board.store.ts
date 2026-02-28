@@ -9,19 +9,14 @@ import { IpcClientService } from '../services/ipc-client.service';
 export class BoardStore {
   private readonly ipc = inject(IpcClientService);
   private readonly tasksSubject = new BehaviorSubject<Task[]>([]);
-  private readonly activeRunGroupIdSubject = new BehaviorSubject<number | null>(null);
 
   readonly tasks$ = this.tasksSubject.asObservable();
-  readonly activeRunGroupId$ = this.activeRunGroupIdSubject.asObservable();
 
   private unsubscribers: Array<() => void> = [];
 
   initialize(): void {
     this.unsubscribers.forEach(unsubscribe => unsubscribe());
-    this.unsubscribers = [
-      this.ipc.onTasksUpdated(() => void this.loadTasks()),
-      this.ipc.onRunsUpdated(() => void this.loadTasks())
-    ];
+    this.unsubscribers = [this.ipc.onTasksUpdated(() => void this.loadTasks())];
   }
 
   destroy(): void {
@@ -49,24 +44,9 @@ export class BoardStore {
     await this.loadTasks();
   }
 
-  async startRunGroup(triggeredBy: string): Promise<void> {
-    const runGroupId = await this.ipc.startRunGroup(triggeredBy);
-    this.activeRunGroupIdSubject.next(runGroupId);
-  }
-
-  async finishRunGroup(): Promise<void> {
-    const runGroupId = this.activeRunGroupIdSubject.value;
-    if (!runGroupId) {
-      return;
-    }
-    await this.ipc.finishRunGroup(runGroupId);
-    this.activeRunGroupIdSubject.next(null);
-  }
-
   async recordRun(task: Task, result: 'ok' | 'fail', failureCause: string | null): Promise<void> {
     await this.ipc.recordRun({
       taskId: task.id,
-      runGroupId: this.activeRunGroupIdSubject.value,
       result,
       failureCause,
       agentName: task.assignedAgent,

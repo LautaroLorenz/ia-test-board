@@ -3,15 +3,7 @@
  */
 exports.seed = async function seed(knex) {
   await knex('task_runs').del();
-  await knex('run_groups').del();
   await knex('tasks').del();
-
-  const [runGroupId] = await knex('run_groups').insert({
-    triggered_by: 'seed',
-    started_at: knex.fn.now(),
-    finished_at: knex.fn.now(),
-    created_at: knex.fn.now()
-  });
 
   const [taskAId] = await knex('tasks').insert({
     title: 'Validar login con usuario activo',
@@ -40,7 +32,6 @@ exports.seed = async function seed(knex) {
   await knex('task_runs').insert([
     {
       task_id: taskAId,
-      run_group_id: runGroupId,
       result: 'ok',
       failure_cause: null,
       agent_name: 'agent-alpha',
@@ -52,7 +43,6 @@ exports.seed = async function seed(knex) {
     },
     {
       task_id: taskBId,
-      run_group_id: runGroupId,
       result: 'fail',
       failure_cause: 'payment_gateway_timeout',
       agent_name: 'agent-beta',
@@ -64,7 +54,6 @@ exports.seed = async function seed(knex) {
     },
     {
       task_id: taskBId,
-      run_group_id: runGroupId,
       result: 'fail',
       failure_cause: 'payment_gateway_timeout',
       agent_name: 'agent-gamma',

@@ -30,7 +30,6 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
   private readonly boardStore = inject(BoardStore);
 
   readonly tasks$ = this.boardStore.tasks$;
-  readonly runGroupId$ = this.boardStore.activeRunGroupId$;
   readonly waitingTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'waiting')));
   readonly executingTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'executing')));
   readonly finishedTasks$ = this.tasks$.pipe(map(tasks => tasks.filter(task => task.status === 'finished')));
@@ -43,6 +42,11 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
     expectedResult: ''
   };
   isNewTaskDialogVisible = false;
+  isExecuteDialogVisible = false;
+  isFailDialogVisible = false;
+  selectedTask: Task | null = null;
+  executeAgentName = '';
+  failCause = '';
 
   ngOnInit(): void {
     this.boardStore.initialize();
@@ -75,28 +79,45 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
     this.isNewTaskDialogVisible = true;
   }
 
-  async changeStatus(payload: { taskId: number; status: 'waiting' | 'executing' | 'finished' }): Promise<void> {
-    await this.boardStore.updateStatus(payload.taskId, payload.status);
+  openExecuteDialog(task: Task): void {
+    this.selectedTask = task;
+    this.executeAgentName = task.assignedAgent || '';
+    this.isExecuteDialogVisible = true;
   }
 
-  async assignAgent(payload: { taskId: number; agentName: string | null }): Promise<void> {
-    await this.boardStore.assignAgent(payload.taskId, payload.agentName);
+  async confirmExecuteTask(): Promise<void> {
+    if (!this.selectedTask || !this.executeAgentName.trim()) {
+      return;
+    }
+
+    await this.boardStore.assignAgent(this.selectedTask.id, this.executeAgentName.trim());
+    await this.boardStore.updateStatus(this.selectedTask.id, 'executing');
+    this.isExecuteDialogVisible = false;
+    this.selectedTask = null;
+    this.executeAgentName = '';
   }
 
-  async recordOk(task: Task): Promise<void> {
+  async registerOk(task: Task): Promise<void> {
     await this.boardStore.recordRun(task, 'ok', null);
+    await this.boardStore.updateStatus(task.id, 'finished');
   }
 
-  async recordFail(payload: { task: Task; cause: string | null }): Promise<void> {
-    await this.boardStore.recordRun(payload.task, 'fail', payload.cause);
+  openFailDialog(task: Task): void {
+    this.selectedTask = task;
+    this.failCause = task.latestFailureCause || '';
+    this.isFailDialogVisible = true;
   }
 
-  async startRunGroup(): Promise<void> {
-    const triggeredBy = window.prompt('Nombre del agente que inicia la corrida', 'manual') || 'manual';
-    await this.boardStore.startRunGroup(triggeredBy);
+  async confirmFailTask(): Promise<void> {
+    if (!this.selectedTask || !this.failCause.trim()) {
+      return;
+    }
+
+    await this.boardStore.recordRun(this.selectedTask, 'fail', this.failCause.trim());
+    await this.boardStore.updateStatus(this.selectedTask.id, 'finished');
+    this.isFailDialogVisible = false;
+    this.selectedTask = null;
+    this.failCause = '';
   }
 
-  async finishRunGroup(): Promise<void> {
-    await this.boardStore.finishRunGroup();
-  }
 }

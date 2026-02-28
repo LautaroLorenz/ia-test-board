@@ -88,7 +88,6 @@ function registerTasksIpc() {
             updated_at: db.fn.now()
         });
         (0, events_1.emitTasksUpdated)();
-        (0, events_1.emitStatusUpdated)();
         return true;
     }));
     electron_1.ipcMain.handle('tasks:assign-agent', (_, payload) => __awaiter(this, void 0, void 0, function* () {

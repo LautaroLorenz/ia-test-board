@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { ElectronService } from './electron/electron.service';
 import { CreateTaskInput, Task, TaskStatus } from '../models/task.model';
-import { LatestRunSummary } from '../models/status.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,17 +24,8 @@ export class IpcClientService {
     await this.invoke('tasks:assign-agent', [{ taskId, agentName }]);
   }
 
-  async startRunGroup(triggeredBy: string): Promise<number> {
-    return this.invoke<number>('runs:start-group', [{ triggeredBy }]);
-  }
-
-  async finishRunGroup(runGroupId: number): Promise<void> {
-    await this.invoke('runs:finish-group', [{ runGroupId }]);
-  }
-
   async recordRun(payload: {
     taskId: number;
-    runGroupId: number | null;
     result: 'ok' | 'fail';
     failureCause: string | null;
     agentName: string | null;
@@ -45,20 +35,8 @@ export class IpcClientService {
     await this.invoke('runs:record', [payload]);
   }
 
-  async getLatestSummary(): Promise<LatestRunSummary> {
-    return this.invoke<LatestRunSummary>('status:get-latest-summary', []);
-  }
-
   onTasksUpdated(callback: () => void): () => void {
     return this.listen('tasks:updated', callback);
-  }
-
-  onRunsUpdated(callback: () => void): () => void {
-    return this.listen('runs:updated', callback);
-  }
-
-  onStatusUpdated(callback: () => void): () => void {
-    return this.listen('status:updated', callback);
   }
 
   private async invoke<T>(channel: string, args: unknown[]): Promise<T> {
