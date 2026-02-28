@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Task } from '../../core/models/task.model';
+import { TaskResult } from '../../core/models/task-result.enum';
 
 @Component({
   selector: 'app-task-card',
@@ -16,10 +17,12 @@ import { Task } from '../../core/models/task.model';
       <p><strong>Agente:</strong> {{ task.assignedAgent || 'Sin asignar' }}</p>
       <p>
         <strong>Ultima ejecucion:</strong>
-        @if (task.latestResult === 'ok') {
+        @if (task.latestResult === taskResult.OK) {
           <span>OK</span>
-        } @else if (task.latestResult === 'fail') {
+        } @else if (task.latestResult === taskResult.FAIL) {
           <span>Falla: {{ task.latestFailureCause || 'sin causa' }}</span>
+        } @else if (task.latestResult === taskResult.SKIP) {
+          <span>Skip</span>
         } @else {
           <span>Sin ejecuciones</span>
         }
@@ -29,12 +32,20 @@ import { Task } from '../../core/models/task.model';
         <div class="bottom-actions">
           @if (task.status === 'waiting') {
             <button type="button" (click)="executeRequested.emit(task)">Ejecutar</button>
+            <button type="button" class="danger" (click)="deleteRequested.emit(task)">Eliminar</button>
           }
 
           @if (task.status === 'executing') {
             <button type="button" (click)="recordOk.emit(task)">Registrar OK</button>
             <button type="button" (click)="recordFailRequested.emit(task)">Registrar Falla</button>
+            <button type="button" class="warning" (click)="skipRequested.emit(task)">Skip</button>
           }
+        </div>
+      }
+
+      @if (task.status === 'finished') {
+        <div class="bottom-actions">
+          <button type="button" (click)="resetRequested.emit(task)">Reset</button>
         </div>
       }
     </article>
@@ -98,12 +109,28 @@ import { Task } from '../../core/models/task.model';
     button:hover {
       filter: brightness(1.05);
     }
+
+    button.warning {
+      background: #f59e0b;
+      border-color: #f59e0b;
+      color: #111827;
+    }
+
+    button.danger {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: #ffffff;
+    }
   `]
 })
 export class TaskCardComponent {
+  readonly taskResult = TaskResult;
   @Input({ required: true }) task!: Task;
 
   @Output() executeRequested = new EventEmitter<Task>();
+  @Output() deleteRequested = new EventEmitter<Task>();
   @Output() recordOk = new EventEmitter<Task>();
   @Output() recordFailRequested = new EventEmitter<Task>();
+  @Output() skipRequested = new EventEmitter<Task>();
+  @Output() resetRequested = new EventEmitter<Task>();
 }

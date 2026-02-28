@@ -7,6 +7,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { CreateTaskInput, Task } from '../../core/models/task.model';
+import { TaskResult } from '../../core/models/task-result.enum';
 import { BoardStore } from '../../core/state/board.store';
 import { TaskCardComponent } from './task-card.component';
 
@@ -98,7 +99,24 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
   }
 
   async registerOk(task: Task): Promise<void> {
-    await this.boardStore.recordRun(task, 'ok', null);
+    await this.boardStore.recordRun(task, TaskResult.OK, null);
+    await this.boardStore.updateStatus(task.id, 'finished');
+  }
+
+  async deleteWaitingTask(task: Task): Promise<void> {
+    const confirmed = window.confirm(`Eliminar la task "${task.title}"?`);
+    if (!confirmed) {
+      return;
+    }
+    await this.boardStore.deleteTask(task.id);
+  }
+
+  async skipExecutingTask(task: Task): Promise<void> {
+    const confirmed = window.confirm(`Hacer skip de la task "${task.title}"?`);
+    if (!confirmed) {
+      return;
+    }
+    await this.boardStore.recordRun(task, TaskResult.SKIP, null);
     await this.boardStore.updateStatus(task.id, 'finished');
   }
 
@@ -113,11 +131,20 @@ export class TasksBoardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    await this.boardStore.recordRun(this.selectedTask, 'fail', this.failCause.trim());
+    await this.boardStore.recordRun(
+      this.selectedTask,
+      TaskResult.FAIL,
+      this.failCause.trim(),
+    );
     await this.boardStore.updateStatus(this.selectedTask.id, 'finished');
     this.isFailDialogVisible = false;
     this.selectedTask = null;
     this.failCause = '';
+  }
+
+  async resetTask(task: Task): Promise<void> {
+    await this.boardStore.assignAgent(task.id, null);
+    await this.boardStore.updateStatus(task.id, 'waiting');
   }
 
 }

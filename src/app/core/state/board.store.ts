@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { CreateTaskInput, Task, TaskStatus } from '../models/task.model';
+import { TaskResult } from '../models/task-result.enum';
 import { IpcClientService } from '../services/ipc-client.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BoardStore {
   private readonly ipc = inject(IpcClientService);
@@ -15,12 +16,12 @@ export class BoardStore {
   private unsubscribers: Array<() => void> = [];
 
   initialize(): void {
-    this.unsubscribers.forEach(unsubscribe => unsubscribe());
+    this.unsubscribers.forEach((unsubscribe) => unsubscribe());
     this.unsubscribers = [this.ipc.onTasksUpdated(() => void this.loadTasks())];
   }
 
   destroy(): void {
-    this.unsubscribers.forEach(unsubscribe => unsubscribe());
+    this.unsubscribers.forEach((unsubscribe) => unsubscribe());
     this.unsubscribers = [];
   }
 
@@ -44,14 +45,23 @@ export class BoardStore {
     await this.loadTasks();
   }
 
-  async recordRun(task: Task, result: 'ok' | 'fail', failureCause: string | null): Promise<void> {
+  async deleteTask(taskId: number): Promise<void> {
+    await this.ipc.deleteTask(taskId);
+    await this.loadTasks();
+  }
+
+  async recordRun(
+    task: Task,
+    result: TaskResult,
+    failureCause: string | null,
+  ): Promise<void> {
     await this.ipc.recordRun({
       taskId: task.id,
       result,
       failureCause,
       agentName: task.assignedAgent,
       inputSnapshotJson: task.inputVariablesJson,
-      expectedSnapshot: task.expectedResult
+      expectedSnapshot: task.expectedResult,
     });
     await this.loadTasks();
   }

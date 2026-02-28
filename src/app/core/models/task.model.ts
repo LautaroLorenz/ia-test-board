@@ -1,3 +1,5 @@
+import { TaskResult } from './task-result.enum';
+
 export type TaskStatus = 'waiting' | 'executing' | 'finished';
 
 export interface Task {
@@ -9,7 +11,7 @@ export interface Task {
   expectedResult: string;
   status: TaskStatus;
   assignedAgent: string | null;
-  latestResult: 'ok' | 'fail' | null;
+  latestResult: TaskResult | null;
   latestFailureCause: string | null;
   createdAt: string;
   updatedAt: string;

@@ -75,8 +75,11 @@
         <app-task-card
           [task]="task"
           (executeRequested)="openExecuteDialog($event)"
+          (deleteRequested)="deleteWaitingTask($event)"
           (recordOk)="registerOk($event)"
-          (recordFailRequested)="openFailDialog($event)">
+          (recordFailRequested)="openFailDialog($event)"
+          (skipRequested)="skipExecutingTask($event)"
+          (resetRequested)="resetTask($event)">
         </app-task-card>
       }
     </div>
@@ -87,8 +90,11 @@
         <app-task-card
           [task]="task"
           (executeRequested)="openExecuteDialog($event)"
+          (deleteRequested)="deleteWaitingTask($event)"
           (recordOk)="registerOk($event)"
-          (recordFailRequested)="openFailDialog($event)">
+          (recordFailRequested)="openFailDialog($event)"
+          (skipRequested)="skipExecutingTask($event)"
+          (resetRequested)="resetTask($event)">
         </app-task-card>
       }
     </div>
@@ -99,8 +105,11 @@
         <app-task-card
           [task]="task"
           (executeRequested)="openExecuteDialog($event)"
+          (deleteRequested)="deleteWaitingTask($event)"
           (recordOk)="registerOk($event)"
-          (recordFailRequested)="openFailDialog($event)">
+          (recordFailRequested)="openFailDialog($event)"
+          (skipRequested)="skipExecutingTask($event)"
+          (resetRequested)="resetTask($event)">
         </app-task-card>
       }
     </div>

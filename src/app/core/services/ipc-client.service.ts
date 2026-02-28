@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { ElectronService } from './electron/electron.service';
 import { CreateTaskInput, Task, TaskStatus } from '../models/task.model';
+import { TaskResult } from '../models/task-result.enum';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class IpcClientService {
   private readonly electron = inject(ElectronService);
@@ -24,9 +25,13 @@ export class IpcClientService {
     await this.invoke('tasks:assign-agent', [{ taskId, agentName }]);
   }
 
+  async deleteTask(taskId: number): Promise<void> {
+    await this.invoke('tasks:delete', [{ taskId }]);
+  }
+
   async recordRun(payload: {
     taskId: number;
-    result: 'ok' | 'fail';
+    result: TaskResult;
     failureCause: string | null;
     agentName: string | null;
     inputSnapshotJson: string;
@@ -41,7 +46,9 @@ export class IpcClientService {
 
   private async invoke<T>(channel: string, args: unknown[]): Promise<T> {
     if (!this.electron.isElectron) {
-      throw new Error(`IPC channel "${channel}" is only available in Electron mode.`);
+      throw new Error(
+        `IPC channel "${channel}" is only available in Electron mode.`,
+      );
     }
     return this.electron.ipcRenderer.invoke(channel, ...args) as Promise<T>;
   }

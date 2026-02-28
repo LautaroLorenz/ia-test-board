@@ -101,5 +101,11 @@ function registerTasksIpc() {
         (0, events_1.emitTasksUpdated)();
         return true;
     }));
+    electron_1.ipcMain.handle('tasks:delete', (_, payload) => __awaiter(this, void 0, void 0, function* () {
+        const db = (0, connection_1.getDb)();
+        yield db('tasks').where({ id: payload.taskId }).del();
+        (0, events_1.emitTasksUpdated)();
+        return true;
+    }));
 }
 //# sourceMappingURL=tasks.ipc.js.map

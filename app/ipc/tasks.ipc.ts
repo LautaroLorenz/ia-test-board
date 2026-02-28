@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { getDb } from '../db/connection';
 import { emitTasksUpdated } from './events';
+import { TaskResult } from '../models/task-result.enum';
 
 type TaskStatus = 'waiting' | 'executing' | 'finished';
 
@@ -23,7 +24,7 @@ type TaskRow = {
   assigned_agent: string | null;
   created_at: string;
   updated_at: string;
-  latest_result?: 'ok' | 'fail' | null;
+  latest_result?: TaskResult | null;
   latest_failure_cause?: string | null;
 };
 
@@ -67,8 +68,8 @@ export function registerTasksIpc(): void {
           .groupBy('tr2.task_id');
       });
 
-    const latestByTaskId = new Map<number, { latest_result: 'ok' | 'fail'; latest_failure_cause: string | null }>();
-    latestRuns.forEach((row: { task_id: number; latest_result: 'ok' | 'fail'; latest_failure_cause: string | null }) => {
+    const latestByTaskId = new Map<number, { latest_result: TaskResult; latest_failure_cause: string | null }>();
+    latestRuns.forEach((row: { task_id: number; latest_result: TaskResult; latest_failure_cause: string | null }) => {
       latestByTaskId.set(row.task_id, {
         latest_result: row.latest_result,
         latest_failure_cause: row.latest_failure_cause
@@ -131,6 +132,13 @@ export function registerTasksIpc(): void {
         updated_at: db.fn.now()
       });
 
+    emitTasksUpdated();
+    return true;
+  });
+
+  ipcMain.handle('tasks:delete', async (_, payload: { taskId: number }) => {
+    const db = getDb();
+    await db('tasks').where({ id: payload.taskId }).del();
     emitTasksUpdated();
     return true;
   });

@@ -25,7 +25,7 @@ function registerRunsIpc() {
             expected_snapshot: payload.expectedSnapshot,
             started_at: db.fn.now(),
             finished_at: db.fn.now(),
-            created_at: db.fn.now()
+            created_at: db.fn.now(),
         });
         (0, events_1.emitTasksUpdated)();
         return true;
